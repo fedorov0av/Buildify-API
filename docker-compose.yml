@@ -1,0 +1,39 @@
+version: "3.9"
+services:
+  buildify-api:
+    build: ./
+    restart: unless-stopped
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --proxy-headers --forwarded-allow-ips=*
+    ports:
+      - "80:8000"  # HTTP порт
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - docker_network
+    environment:
+      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}  # Подключение к PostgreSQL
+    depends_on:
+      postgres:
+        condition: service_started
+
+  postgres:
+    image: postgres:13
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER}        # Имя пользователя PostgreSQL
+      POSTGRES_PASSWORD: ${DB_PASSWORD} # Пароль пользователя
+      POSTGRES_DB: ${DB_NAME}    # Имя базы данных
+    ports:
+      - "${DB_PORT}:${DB_PORT}"  # для Dev
+    volumes:
+      - ./database/postgres_data:/var/lib/postgresql/data  # Тома для хранения данных PostgreSQL
+    networks:
+      - docker_network
+
+networks:
+  docker_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local

@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "buildify-api"
+version = "0.1.0"
+description = ""
+authors = ["fedorov0av <fedorov0av@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.115.6"
+sqlalchemy = "^2.0.37"
+alembic = "^1.14.0"
+loguru = "^0.7.3"
+python-dotenv = "^1.0.1"
+uvicorn = "^0.34.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
