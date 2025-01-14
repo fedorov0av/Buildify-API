@@ -23,7 +23,7 @@ services:
       - "80:8000"  # HTTP порт
     volumes:
       - ./logs:/app/logs
-      - ./al:/alembic
+      - ./alembic:/app/alembic
     networks:
       - docker_network
     environment:

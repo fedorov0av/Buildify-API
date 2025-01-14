@@ -10,7 +10,7 @@ class Activity(Base, TimestampMixin):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(300))
-    parent_id = Mapped[int] = mapped_column(ForeignKey("activity.id"), nullable=True)
+    parent_id: Mapped[int] = mapped_column(ForeignKey("activity.id"), nullable=True)
     
     # Связь с родительским элементом
     parent = relationship('Activity', remote_side=[id], backref='children')
