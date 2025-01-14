@@ -1,21 +1,5 @@
 version: "3.9"
 services:
-  buildify-api:
-    build: ./
-    restart: unless-stopped
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --proxy-headers --forwarded-allow-ips=*
-    ports:
-      - "80:8000"  # HTTP порт
-    volumes:
-      - ./logs:/app/logs
-    networks:
-      - docker_network
-    environment:
-      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}  # Подключение к PostgreSQL
-    depends_on:
-      postgres:
-        condition: service_started
-
   postgres:
     image: postgres:13
     restart: unless-stopped
@@ -29,6 +13,30 @@ services:
       - ./database/postgres_data:/var/lib/postgresql/data  # Тома для хранения данных PostgreSQL
     networks:
       - docker_network
+
+  buildify-api:
+    build: ./
+    restart: unless-stopped
+    command: /app/entrypoint.sh
+    # command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --proxy-headers --forwarded-allow-ips=*
+    ports:
+      - "80:8000"  # HTTP порт
+    volumes:
+      - ./logs:/app/logs
+      - ./al:/alembic
+    networks:
+      - docker_network
+    environment:
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}  # Подключение к PostgreSQL
+    depends_on:
+      - postgres
+      # postgres:
+      #   condition: service_started
 
 networks:
   docker_network:
