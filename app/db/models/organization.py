@@ -1,11 +1,13 @@
 from __future__ import annotations
-
+from typing import List
 from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .base import TimestampMixin
 from .base.declarative import Base
+from app.db.models.assoc_table import organization_activity
+from app.db.models.activity import Activity
 
 class Organization(Base, TimestampMixin):
     __tablename__ = "organization"
@@ -13,7 +15,7 @@ class Organization(Base, TimestampMixin):
     organization_name: Mapped[str] = mapped_column(String(300))
     organization_building_id: Mapped[int] = mapped_column(ForeignKey("building.id"))
     organization_building = relationship('Building')
-    organization_activities: Mapped[str] = mapped_column(String(300))
+    organization_activities: Mapped[List[Activity]] = relationship(secondary=organization_activity)
     
     @staticmethod
     async def add_organization(session: AsyncSession, organization_name: str, organization_telephone: str, organization_building: str,

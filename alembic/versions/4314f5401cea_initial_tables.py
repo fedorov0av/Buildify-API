@@ -9,7 +9,9 @@ from typing import Sequence, Union
 
 from alembic import op
 import sqlalchemy as sa
-
+from sqlalchemy import orm
+from app.db.models import Organization, Activity, Building, Phone, OrganizationActivity
+from app.setup.test_data import TEST_DATA
 
 # revision identifiers, used by Alembic.
 revision: str = '4314f5401cea'
@@ -66,6 +68,56 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###
+    # Inserting data into the activity table
+    bind = op.get_bind()
+    session = orm.Session(bind=bind)
+    
+    for building in TEST_DATA['buildings']:
+        building_id = building['id']
+        building_address = building['address']
+        building_coordinates = building['coordinates']
+        building_bd = Building(
+                                id=building_id,
+                                address=building_address,
+                                latitude=building_coordinates[0],
+                                longitude=building_coordinates[1]
+                               )
+        session.add(building_bd)
+        session.commit()
+    
+    for activity in TEST_DATA['activity']:
+        activity_id = activity['id']
+        activity_name = activity['name']
+        activity_subcategories: list[dict] = activity['subcategories']
+        activity_bd = Activity(id=activity_id, name=activity_name)
+        session.add(activity_bd)
+        for activity_subcategory in activity_subcategories:
+            child_activity_subcategory_bd = Activity(
+                                                    id=activity_subcategory["id"],
+                                                    name=activity_subcategory["name"],
+                                                    parent_id=activity_bd.id
+                                                    )
+            session.add(child_activity_subcategory_bd)
+        session.commit()
+
+    for organization in TEST_DATA['organizations']:
+        organization_id = organization['id']
+        organization_name = organization['name']
+        organization_ph_numbers = organization['phone_numbers']
+        organization_building_id = organization['building_id']
+        organization_activity_ids = organization['activity_ids']
+        organization_bd = Organization(
+                                        id=organization_id,
+                                        organization_name=organization_name,
+                                        organization_building_id=organization_building_id
+                                        )
+        for activity_id in organization_activity_ids:
+            activity_bd = Activity.get_or_none(session=session, id=activity_id)
+            organization_bd.organization_activities.append(activity_bd)
+        for organization_ph_number in organization_ph_numbers:
+            ph_number_bd = Phone(number=organization_ph_number, organization_id=organization_bd.id)
+        session.add(organization_bd)
+        session.commit()
 
 
 def downgrade() -> None:
