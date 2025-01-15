@@ -6,7 +6,7 @@ from sqlalchemy import pool
 
 from alembic import context
 
-from app.db.models import Organization, Activity, Building, Phone, OrganizationActivity
+from app.db.models import Organization, Activity, Building, Phone, organization_activity
 from app.db.models.base import Base
 
 config = dotenv_values(".env")

@@ -26,14 +26,14 @@ TEST_DATA = {
             "name": "ООО 'Автодетали'",
             "phone_numbers": ["8-800-555-35-00", "9-123-444-99-22"],
             "building_id": 4,
-            "activity_ids": [9, 10]  # Запчасти, Аксессуары
+            "activity_ids": [5, 6]  # Запчасти, Аксессуары
         },
         {
             "id": 5,
             "name": "ООО 'Печать'",
             "phone_numbers": ["8-499-555-33-11"],
             "building_id": 5,
-            "activity_ids": [11]  # Полиграфия
+            "activity_ids": [9]  # Полиграфия
         },
         {
             "id": 6,
@@ -47,28 +47,28 @@ TEST_DATA = {
             "name": "ООО 'Фудмастер'",
             "phone_numbers": ["8-926-444-55-66", "7-800-123-45-67"],
             "building_id": 4,
-            "activity_ids": [2, 12]  # Молочная продукция, Кулинария
+            "activity_ids": [2, 11]  # Молочная продукция, Кулинария
         },
         {
             "id": 8,
             "name": "ЗАО 'Гармония'",
             "phone_numbers": ["8-495-222-11-99"],
             "building_id": 3,
-            "activity_ids": [13]  # Здоровое питание
+            "activity_ids": [10]  # Здоровое питание
         },
         {
             "id": 9,
             "name": "ООО 'Планета Авто'",
             "phone_numbers": ["8-900-111-22-33"],
             "building_id": 7,
-            "activity_ids": [10]  # Аксессуары
+            "activity_ids": [6]  # Аксессуары
         },
         {
             "id": 10,
             "name": "ИП 'ЭкоЛайф'",
             "phone_numbers": ["8-938-777-22-11"],
             "building_id": 8,
-            "activity_ids": [14]  # Эко-продукты
+            "activity_ids": [12]  # Эко-продукты
         }
     ],
     "buildings": [

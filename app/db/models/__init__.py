@@ -3,7 +3,7 @@ from app.db.models.organization import Organization
 from app.db.models.activity import Activity
 from app.db.models.building import Building
 from app.db.models.phone import Phone
-from app.db.models.assoc_table import OrganizationActivity
+from app.db.models.assoc_table import organization_activity
 
 __all__ = (
     "Base",
@@ -11,7 +11,7 @@ __all__ = (
 
     "Organization",
     "Activity",
-    "OrganizationActivity",
+    "organization_activity",
     "Building",
     "Phone",
 )
