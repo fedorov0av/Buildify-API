@@ -18,24 +18,23 @@ class Organization(Base, TimestampMixin):
     organization_building_id: Mapped[int] = mapped_column(ForeignKey("building.id"))
     organization_building: Mapped['Building'] = relationship(foreign_keys=[organization_building_id])
     organization_activities: Mapped[List[Activity]] = relationship(secondary=organization_activity)
-    
+
+
     @staticmethod
-    async def add_organization(session: AsyncSession, organization_name: str, organization_telephone: str, organization_building: str,
-                       organization_activities: str,): # fix me
-        organization = Organization(organization_name=organization_name, page_description=organization_telephone, page_path=organization_building,
-                     page_content=organization_activities,)
-        session.add(organization)
-        await session.commit()
-        return organization
-    
-    @staticmethod
-    async def get_organization_by_name(session: AsyncSession, organization_name: str): # fix me
-        organization_db = await Organization.get_or_none(session, organization_name=organization_name)
+    async def get_organization_by_name(session: AsyncSession, name: str): # fix me
+        query = select(Organization).where(Organization.organization_name==name)\
+                    .options(selectinload(Organization.organization_building))\
+                    .options(selectinload(Organization.organization_activities))
+        result = await session.scalars(query)
+        try:
+            organization_db = result.one()    
+        except NoResultFound:
+            return None
         return organization_db
     
     @staticmethod
-    async def get_organization_by_id(session: AsyncSession, organization_id: str): # fix me
-        query = select(Organization).where(Organization.id == organization_id)\
+    async def get_organization_by_id(session: AsyncSession, id: str): # fix me
+        query = select(Organization).where(Organization.id==id)\
                     .options(selectinload(Organization.organization_building))\
                     .options(selectinload(Organization.organization_activities))
         result = await session.scalars(query)
