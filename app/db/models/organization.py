@@ -21,7 +21,7 @@ class Organization(Base, TimestampMixin):
 
 
     @staticmethod
-    async def get_organization_by_name(session: AsyncSession, name: str): # fix me
+    async def get_organization_by_name(session: AsyncSession, name: str):
         query = select(Organization).where(Organization.organization_name==name)\
                     .options(selectinload(Organization.organization_building))\
                     .options(selectinload(Organization.organization_activities))
@@ -33,8 +33,20 @@ class Organization(Base, TimestampMixin):
         return organization_db
     
     @staticmethod
-    async def get_organization_by_id(session: AsyncSession, id: str): # fix me
+    async def get_organization_by_id(session: AsyncSession, id: str):
         query = select(Organization).where(Organization.id==id)\
+                    .options(selectinload(Organization.organization_building))\
+                    .options(selectinload(Organization.organization_activities))
+        result = await session.scalars(query)
+        try:
+            organization_db = result.one()    
+        except NoResultFound:
+            return None
+        return organization_db
+    
+    @staticmethod
+    async def get_organization_by_building_id(session: AsyncSession, building_id: str):
+        query = select(Organization).where(Organization.organization_building_id==building_id)\
                     .options(selectinload(Organization.organization_building))\
                     .options(selectinload(Organization.organization_activities))
         result = await session.scalars(query)

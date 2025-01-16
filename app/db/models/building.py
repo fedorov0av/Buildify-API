@@ -1,5 +1,7 @@
-from sqlalchemy import String
-from sqlalchemy.orm import mapped_column, Mapped
+from sqlalchemy import String, ForeignKey, select
+from sqlalchemy.orm import Mapped, mapped_column, relationship, selectinload
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.exc import NoResultFound
 
 from .base.declarative import Base
 from .base import TimestampMixin
@@ -15,3 +17,14 @@ class Building(Base, TimestampMixin):
 
     def __repr__(self):
         return f"<Building(id={self.id}, address={self.address}, latitude={self.latitude}, longitude={self.longitude})>"
+
+
+    @staticmethod
+    async def get_building_by_address(session: AsyncSession, address: str):
+        query = select(Building).where(Building.address==address)
+        result = await session.scalars(query)
+        try:
+            building_db = result.one()    
+        except NoResultFound:
+            return None
+        return building_db
