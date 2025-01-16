@@ -112,8 +112,6 @@ def upgrade() -> None:
             activity_bd = session.scalars(query).one()
             organization_bd.organization_activities.append(activity_bd)
         for organization_ph_number in organization_ph_numbers:
-            print('activity_id=', organization_ph_number)
-
             ph_number_bd = Phone(number=organization_ph_number, organization_id=organization_bd.id)
             session.add(ph_number_bd)
         session.add(organization_bd)
