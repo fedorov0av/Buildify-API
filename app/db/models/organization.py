@@ -56,3 +56,14 @@ class Organization(Base, TimestampMixin):
             return None
         return organization_db
     
+    @staticmethod
+    async def get_organization_by_activity_id(session: AsyncSession, activity_id: str):
+        query = select(Organization).where(Organization.organization_activities.any(Activity.id == activity_id),)\
+                    .options(selectinload(Organization.organization_building))\
+                    .options(selectinload(Organization.organization_activities))
+        result = await session.scalars(query)
+        try:
+            organization_db = result.all()    
+        except NoResultFound:
+            return None
+        return organization_db

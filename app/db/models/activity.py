@@ -1,5 +1,7 @@
-from sqlalchemy import String, ForeignKey
+from sqlalchemy import String, ForeignKey, select
 from sqlalchemy.orm import relationship, mapped_column, Mapped
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.exc import NoResultFound
 
 from .base.declarative import Base
 from .base import TimestampMixin
@@ -17,3 +19,14 @@ class Activity(Base, TimestampMixin):
     
     def __repr__(self):
         return f"<Activity(id={self.id}, name={self.name}, parent_id={self.parent_id})>"
+    
+    
+    @staticmethod
+    async def get_activity_by_name(session: AsyncSession, name: str):
+        query = select(Activity).where(Activity.name==name)
+        result = await session.scalars(query)
+        try:
+            activity_db = result.one()    
+        except NoResultFound:
+            return None
+        return activity_db

@@ -2,13 +2,20 @@ from fastapi import APIRouter, Depends, Request, Response, HTTPException
 
 from app.setup.db import DBSessionDep
 from app.secure import get_api_key
-from app.db.models import Organization, Building
+from app.db.models import Organization, Building, Activity
 from app.config.consts import API_VERSION
 
 
 org_router = APIRouter()
 
-def convert_organization_for_responce(organization_db: Organization):
+def convert_organization_for_responce(organization_db: Organization | list[Organization]):
+    if type(organization_db) == list:
+        return [{
+            "id": organization.id,
+            "name": organization.organization_name,
+            "building": organization.organization_building.address,
+            "activities": [act.name for act in organization.organization_activities],
+        } for organization in organization_db]
     return {
         "id": organization_db.id,
         "name": organization_db.organization_name,
@@ -44,3 +51,13 @@ async def get_orgs_by_buildings(building_address: str, session: DBSessionDep, ap
     else:
         raise HTTPException(status_code=204, detail="Organization not found")
 
+@org_router.get(f'/api/{API_VERSION}/org-info-by-activity')
+async def get_orgs_by_activity(activity_name: str, session: DBSessionDep, api_key: str = Depends(get_api_key)):
+    activity_db: Activity = await Activity.get_activity_by_name(session, name=activity_name)
+    if not activity_db:
+        raise HTTPException(status_code=204, detail="Activity not found")
+    organization_db: Organization = await Organization.get_organization_by_activity_id(session, activity_id=activity_db.id)
+    if organization_db:
+        return convert_organization_for_responce(organization_db)
+    else:
+        raise HTTPException(status_code=204, detail="Organization not found")
