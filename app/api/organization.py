@@ -72,5 +72,5 @@ async def get_orgs_by_geo(geo_square: GeoSquare, session: DBSessionDep, api_key:
     print(geo_square)
     if not GeoSquare.check_valid_geo_square(geo_square):
         raise HTTPException(status_code=422, detail="Invalid geo square") 
-
+    
     return {"status": "ok"}
