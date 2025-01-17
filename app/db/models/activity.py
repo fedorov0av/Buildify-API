@@ -30,3 +30,13 @@ class Activity(Base, TimestampMixin):
         except NoResultFound:
             return None
         return activity_db
+    
+    @staticmethod
+    async def get_childs_activities_by_id(session: AsyncSession, id: int):
+        query = select(Activity).where(Activity.parent_id==id)
+        result = await session.scalars(query)
+        try:
+            childs_activity_db = result.all()    
+        except NoResultFound:
+            return None
+        return childs_activity_db
