@@ -5,11 +5,13 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship, selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import NoResultFound
 
+from app.schemes.geo import GeoSquare
 from .base import TimestampMixin
 from .base.declarative import Base
 from app.db.models.assoc_table import organization_activity
 from app.db.models.activity import Activity
 from app.db.models.building import Building
+
 
 class Organization(Base, TimestampMixin):
     __tablename__ = "organization"
@@ -67,3 +69,16 @@ class Organization(Base, TimestampMixin):
         except NoResultFound:
             return None
         return organization_db
+    
+    @staticmethod
+    async def get_organizations_by_geo_square(session: AsyncSession, geo_square: GeoSquare): # fix me
+        pass
+        # query = select(Organization).where(Organization.organization_activities.any(Activity.id == geo_square),)\
+        #             .options(selectinload(Organization.organization_building))\
+        #             .options(selectinload(Organization.organization_activities))
+        # result = await session.scalars(query)
+        # try:
+        #     organization_db = result.all()    
+        # except NoResultFound:
+        #     return None
+        # return organization_db

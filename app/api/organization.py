@@ -4,25 +4,11 @@ from app.setup.db import DBSessionDep
 from app.secure import get_api_key
 from app.db.models import Organization, Building, Activity
 from app.config.consts import API_VERSION
+from app.schemes.geo import GeoSquare
+from app.utils.converters import convert_organization_for_responce
 
 
 org_router = APIRouter()
-
-def convert_organization_for_responce(organization_db: Organization | list[Organization]) -> dict | None:
-    if type(organization_db) == list:
-        return [{
-            "id": organization.id,
-            "name": organization.organization_name,
-            "building": organization.organization_building.address,
-            "activities": [act.name for act in organization.organization_activities],
-        } for organization in organization_db]
-    return {
-        "id": organization_db.id,
-        "name": organization_db.organization_name,
-        "building": organization_db.organization_building.address,
-        "activities": [act.name for act in organization_db.organization_activities],
-    } if organization_db else None
-
 
 @org_router.get(f'/api/{API_VERSION}/org-info-by-id')
 async def get_org_info_by_id(organization_id: int, session: DBSessionDep, api_key: str = Depends(get_api_key)):
@@ -80,3 +66,11 @@ async def get_orgs_by_activities(activity_name: str, session: DBSessionDep, api_
         return convert_organization_for_responce(result)
     else:
         raise HTTPException(status_code=204, detail="Organization not found")
+    
+@org_router.post(f'/api/{API_VERSION}/orgs-by-geo')
+async def get_orgs_by_geo(geo_square: GeoSquare, session: DBSessionDep, api_key: str = Depends(get_api_key)):
+    print(geo_square)
+    if not GeoSquare.check_valid_geo_square(geo_square):
+        raise HTTPException(status_code=422, detail="Invalid geo square") 
+
+    return {"status": "ok"}
