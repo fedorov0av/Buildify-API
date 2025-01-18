@@ -72,5 +72,15 @@ async def get_orgs_by_geo(geo_square: GeoSquare, session: DBSessionDep, api_key:
     print(geo_square)
     if not GeoSquare.check_valid_geo_square(geo_square):
         raise HTTPException(status_code=422, detail="Invalid geo square") 
-    
-    return {"status": "ok"}
+    buildins_db: list[Building] = await Building.get_building_by_geo_square(session, geo_square)
+    if not buildins_db:
+        raise HTTPException(status_code=204, detail="Building not found")
+    organizations_db = []
+    for building in buildins_db:
+        organization_db: Organization = await Organization.get_organization_by_building_id(session, building_id=building.id)
+        if organization_db:
+            organizations_db.append(organization_db)
+    if organizations_db:
+        return convert_organization_for_responce(organizations_db)
+    else:
+        raise HTTPException(status_code=204, detail="Organization not found")

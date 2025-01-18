@@ -5,6 +5,7 @@ from sqlalchemy.exc import NoResultFound
 
 from .base.declarative import Base
 from .base import TimestampMixin
+from app.schemes.geo import GeoSquare
 
 
 class Building(Base, TimestampMixin):
@@ -27,4 +28,17 @@ class Building(Base, TimestampMixin):
             building_db = result.one()    
         except NoResultFound:
             return None
-        return building_db
+        return building_db\
+        
+    @staticmethod
+    async def get_building_by_geo_square(session: AsyncSession, geo_square: GeoSquare):
+        query = select(Building).where(Building.latitude>=geo_square.a[0],
+                                        Building.latitude<=geo_square.c[0],
+                                        Building.longitude>=geo_square.a[1],
+                                        Building.longitude<=geo_square.c[1])
+        result = await session.scalars(query)
+        try:
+            buildings_db = result.all()    
+        except NoResultFound:
+            return None
+        return buildings_db
